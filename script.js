@@ -1,6 +1,7 @@
 var overlay;
 var overlayIndices;
 var type = 0;
+var intervalId = 0;
 
 function pasteFromClipboard(e) {
   // copied from https://stackoverflow.com/a/6338207/536607 like a real programmer  
@@ -69,12 +70,11 @@ function loadImage(data) {
     dest_canvas2.height = 450
     dest_ctx2.putImageData(crop2, 0, 0);
     
-    applyOverlay(overlay);
-    
     var progress = document.getElementById("progress");
     progress.innerHTML = ""
     
-    setInterval(applyOverlay, 500);
+    clearInterval(intervalId)
+    intervalId = setInterval(applyOverlay, 500);
   }
 }
 
