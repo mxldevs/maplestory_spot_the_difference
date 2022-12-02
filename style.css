@@ -1,0 +1,11 @@
+.image_container {
+  margin: 20px 20px;
+}
+
+
+canvas{
+    border:1px solid red;   
+}
+.row{
+    display: flex       
+}
