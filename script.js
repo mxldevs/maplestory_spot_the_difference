@@ -38,12 +38,16 @@ function loadImage(data) {
     src_canvas.height = img.height;
     src_ctx.drawImage(img, 0, 0);    
     
+    // the game resets to 1366x768 automatically, regardless of your game resolution
+    // however in window mode, prnt-scrn captures the title bar as well,
+    // which is 32 pixels in height but maybe different based on theme? Not sure
+    var y_ofs = img.height - 768;    
 
-    var crop1 = src_ctx.getImageData(226, 126, 450, 450)
-    var crop2 = src_ctx.getImageData(684, 126, 450, 450)    
+    var crop1 = src_ctx.getImageData(226, 94 + y_ofs, 450, 450)
+    var crop2 = src_ctx.getImageData(684, 94 + y_ofs, 450, 450)    
     
     // this overlay is just a copy of the left image, with the differing pixels modified
-    overlay = src_ctx.getImageData(226, 126, 450, 450);    
+    overlay = src_ctx.getImageData(226, 94 + y_ofs, 450, 450);    
     
     var data1 = crop1.data
     var data2 = crop2.data
@@ -60,8 +64,7 @@ function loadImage(data) {
         overlayIndices.push(i)        
       }
     }
-        
-    
+            
     dest_canvas1.width = 450
     dest_canvas1.height = 450
     dest_ctx1.putImageData(crop1, 0, 0);        
@@ -74,7 +77,7 @@ function loadImage(data) {
     progress.innerHTML = ""
     
     clearInterval(intervalId)
-    intervalId = setInterval(applyOverlay, 500);
+    intervalId = setInterval(applyOverlay, 250);
   }
 }
 
