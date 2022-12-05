@@ -38,16 +38,50 @@ function loadImage(data) {
     src_canvas.height = img.height;
     src_ctx.drawImage(img, 0, 0);    
     
-    // the game resets to 1366x768 automatically, regardless of your game resolution
-    // however in window mode, prnt-scrn captures the title bar as well,
-    // which is 32 pixels in height but maybe different based on theme? Not sure
-    var y_ofs = img.height - 768;    
+    // on 4K monitors, windows scales everything up by 50% automatically.
+    // users can also scale things up manually in their display settings,
+    // so this tries to account for it. 100% is normal scale, and users
+    // can choose 125%, 150%, 175%, or 200% scale. All coordinates and dimensions
+    // must be adjusted to scale
+    var scale;
+    
+    // All windows have an optional title bar, and then the client area underneath.
+    // For windowed mode, the title bar is 32 pixels. For full-screen, the title bar is removed
+    // It's possible that the title bar may be removed in other circumstances, so we must
+    // apply a Y-offset to account for this.
+    var y_ofs;
+    
+    // The game automatically sets to 1366x768 resolution. At 100% scale, this is OK.
+    // At 150% scale, assuming windowed mode, we will have (768px + 32px) * 1.5 = 1200px
+    
+    // TO-DO: calculate scale based on provided height to support 125%, 175%, 200%
+    // problem is, I don't know how to determine whether there is a title bar or not
+    
+    // 150% scale
+    if (img.height == 1200) {
+      scale = 1.5
+      y_ofs = (img.height / scale) - 768
+    }   
+    // 100% scale
+    else {
+      scale = 1.0
+      y_ofs = img.height - 768;    
+    }
+    
+    // top left corner of the left pic and right pic frame
+    var x1 = 226 * scale
+    var x2 = 684 * scale
+    var y1 = (94 + y_ofs) * scale
+    var y2 = (94 + y_ofs) * scale
+    var width = 450 * scale
+    var height = 450 * scale
 
-    var crop1 = src_ctx.getImageData(226, 94 + y_ofs, 450, 450)
-    var crop2 = src_ctx.getImageData(684, 94 + y_ofs, 450, 450)    
+    var crop1 = src_ctx.getImageData(x1, y1, width, height)
+    var crop2 = src_ctx.getImageData(x2, y2, width, height)
     
     // this overlay is just a copy of the left image, with the differing pixels modified
-    overlay = src_ctx.getImageData(226, 94 + y_ofs, 450, 450);    
+    // so pretty lazy
+    overlay = src_ctx.getImageData(x1, y2, width, height);    
     
     var data1 = crop1.data
     var data2 = crop2.data
@@ -65,12 +99,12 @@ function loadImage(data) {
       }
     }
             
-    dest_canvas1.width = 450
-    dest_canvas1.height = 450
+    dest_canvas1.width = width
+    dest_canvas1.height = height
     dest_ctx1.putImageData(crop1, 0, 0);        
         
-    dest_canvas2.width = 450
-    dest_canvas2.height = 450
+    dest_canvas2.width = width
+    dest_canvas2.height = height
     dest_ctx2.putImageData(crop2, 0, 0);
     
     var progress = document.getElementById("progress");
